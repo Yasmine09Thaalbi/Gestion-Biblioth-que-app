@@ -1,7 +1,6 @@
 package bibliothèque;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
@@ -15,6 +14,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class InterfaceLivre extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final String BDD = "Bibliotheque";
 	private static final String url = "jdbc:mysql://localhost:3306/" + BDD;
 	private static final String username = "root";
@@ -168,7 +171,6 @@ public class InterfaceLivre extends JFrame {
                 tableModel.addRow(row);
             }
 
-            // Assurez-vous que tableLivres est correctement initialisée et associée à votre interface utilisateur
             tableLivres.setModel(tableModel);
 
         } catch (SQLException e) {
@@ -326,7 +328,7 @@ public class InterfaceLivre extends JFrame {
         ajouterButton.setPreferredSize(new Dimension(80, 30));
         JButton supprimerButton = new JButton("Supprimer");
         JButton rechercherButton = new JButton("Rechercher");
-        JButton afficherButton = new JButton("Affichage");
+        JButton afficherButton = new JButton("Afficher");
 
         // Ajout des actions aux boutons
         ajouterButton.addActionListener(new ActionListener() {
@@ -450,18 +452,19 @@ public class InterfaceLivre extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         mainPanel.add(formulairePanel, gbc);
-        formulairePanel.setBackground(new Color(204, 229, 255));
+        formulairePanel.setBackground(new Color(175, 216, 245));
 
         // Ajout des boutonsPanel au mainPanel avec des contraintes pour centrer
         gbc.gridy = -1;
         mainPanel.add(boutonsPanel, gbc);
-        mainPanel.setBackground(new Color(204, 229, 255));
-        boutonsPanel.setBackground(new Color(204, 229, 255));
+        mainPanel.setBackground(new Color(175, 216, 245));
+        boutonsPanel.setBackground(new Color(175, 216, 245));
 
     	tableLivres = new JTable();
-    	JScrollPane sp=new JScrollPane(tableLivres);  
+    	tableLivres.setRowHeight(30); 
+    	JScrollPane sp=new JScrollPane(tableLivres); 
     	sp.setBackground(new Color(204, 229, 255)); 
-    	sp.getViewport().setBackground(new Color(204, 229, 255));
+    	sp.getViewport().setBackground(new Color(175, 216, 245));
     	sp.setBorder(BorderFactory.createEmptyBorder());
     	sp.setViewportBorder(null);
 

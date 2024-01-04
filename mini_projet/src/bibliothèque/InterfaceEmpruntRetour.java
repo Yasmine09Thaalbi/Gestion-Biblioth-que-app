@@ -10,11 +10,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 public class InterfaceEmpruntRetour extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final String BDD = "Bibliotheque";
 	private static final String url = "jdbc:mysql://localhost:3306/" + BDD;
 	private static final String username = "root";
@@ -355,7 +358,7 @@ public class InterfaceEmpruntRetour extends JFrame {
         lecteurField.setColumns(20);
         lecteurField.setPreferredSize(new Dimension(150, 25));
         empruntPanel.add(lecteurField);
-        empruntPanel.setBackground(new Color(204, 229, 255));
+        empruntPanel.setBackground(new Color(175, 216, 245));
 
         JButton emprunterButton = new JButton("Emprunter");
         emprunterButton.setPreferredSize(new Dimension(80, 30));
@@ -388,7 +391,7 @@ public class InterfaceEmpruntRetour extends JFrame {
         retourLecteurField.setColumns(20);
         retourLecteurField.setPreferredSize(new Dimension(150, 25));
         retourPanel.add(retourLecteurField);
-        retourPanel.setBackground(new Color(204, 229, 255));
+        retourPanel.setBackground(new Color(175, 216, 245));
 
         JButton retournerButton = new JButton("Retourner");
         retournerButton.setPreferredSize(new Dimension(80, 30));
@@ -420,7 +423,6 @@ public class InterfaceEmpruntRetour extends JFrame {
             public void actionPerformed(ActionEvent e) {
             	try {
                     String titreLivre = retourLivreField.getText();
-                    long cinLecteur = Long.parseLong(retourLecteurField.getText());
 
                     Connection con = DriverManager.getConnection(url, username, password);
                     System.out.println("Connected!");
@@ -437,7 +439,7 @@ public class InterfaceEmpruntRetour extends JFrame {
         // Ajoutez retourPanel à mainPanel
         gbc.gridx = 1;
         mainPanel.add(retourPanel, gbc);
-        mainPanel.setBackground(new Color(204, 229, 255));
+        mainPanel.setBackground(new Color(175, 216, 245));
 
         getContentPane().add(mainPanel);
         setLocationRelativeTo(null);

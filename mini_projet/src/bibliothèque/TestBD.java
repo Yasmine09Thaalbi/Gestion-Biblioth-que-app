@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.Date;
 
 
 public class TestBD {
@@ -305,19 +304,19 @@ public class TestBD {
 			Connection con = DriverManager.getConnection(url, username, password); 
 
 	        System.out.println("Connected!");
-	        //ajouterLivre(con, new Livre("Stupeur et tremblement", "Nathalie Nothomb",12578945677L));
+	        ajouterLivre(con, new Livre("Stupeur et tremblement", "Nathalie Nothomb",12578945677L));
 	        //ajouterLivre(con, new Livre("Crime et Chatiment", "Fyodor Dostoevsky",1234567891230L));
 	        //ajouterLivre(con ,new LivrePolicier("meurtre","Hercule Poirot ",7412589637418L,"Le crime de l'orient express", "Agatha Christie","ines"));
 	        //ajouterLivre(con , new LivreRomantique("Emma", "Jane Austen",1487956412347L,"longue histoire","Emma"));
 	        //ajouterLivre(con ,new LivreScienceFiction("La planete des singes", "Pierre Boulle",2589631478520L,2500,"Plan�te Soror"));
-	        //supprimerLivre(con , new Livre("Crime et Chatiment", "Fyodor Dostoevsky",1234567891230L));
+	        supprimerLivre(con , new Livre("Crime et Chatiment", "Fyodor Dostoevsky",1234567891230L));
 	        //supprimerLivre(con , new LivrePolicier("meurtre","Hercule Poirot ",7412589637418L,"Le crime de l'orient express", "Agatha Christie","ines"));
 	        
 	        Abonnement a4 = new Abonnement(LocalDate.of(2022, 12, 1),10);
 	        
 	        Lecteur lecteur3 = new LecteurFidèle(264567899,"Selim","Ben Aissa",a4,20,"ii@gmail.com","Romantique");
 	        
-	       // ajouterLecteur(con, lecteur3);
+	        ajouterLecteur(con, lecteur3);
 	        
 	        /*supprimerLecteur(con,new Lecteur(782456789 ,"Ines","Slim"));
 	        

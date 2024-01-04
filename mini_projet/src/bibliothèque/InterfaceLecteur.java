@@ -12,21 +12,16 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 
 public class InterfaceLecteur extends JFrame{
+		/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 		private static final String BDD = "Bibliotheque";
 		private static final String url = "jdbc:mysql://localhost:3306/" + BDD;
 		private static final String username = "root";
@@ -340,7 +335,7 @@ public class InterfaceLecteur extends JFrame{
 	        ajouterButton.setPreferredSize(new Dimension(80, 30));
 	        JButton supprimerButton = new JButton("Supprimer");
 	        JButton rechercherButton = new JButton("Rechercher");
-	        JButton afficherButton = new JButton("Affichage");
+	        JButton afficherButton = new JButton("Afficher");
 
 	        // Ajout des actions aux boutons
 	        ajouterButton.addActionListener(new ActionListener() {
@@ -447,13 +442,14 @@ public class InterfaceLecteur extends JFrame{
 	        // Ajout des boutonsPanel au mainPanel avec des contraintes pour centrer
 	        gbc.gridy = -1;
 	        mainPanel.add(boutonsPanel, gbc);
-	        formulairePanel.setBackground(new Color(204, 229, 255));
-	        mainPanel.setBackground(new Color(204, 229, 255));
+	        formulairePanel.setBackground(new Color(175, 216, 245));
+	        mainPanel.setBackground(new Color(175, 216, 245));
 	        
 	        tableLecteurs = new JTable();
+	        tableLecteurs.setRowHeight(30); 
 	    	JScrollPane sp=new JScrollPane(tableLecteurs);  
 	    	sp.setBackground(new Color(204, 229, 255));
-	    	sp.getViewport().setBackground(new Color(204, 229, 255));
+	    	sp.getViewport().setBackground(new Color(175, 216, 245));
 	    	sp.setBorder(BorderFactory.createEmptyBorder());
 	    	sp.setViewportBorder(null);
 	    	

@@ -113,7 +113,8 @@ public class test {
 	     */
 	     
 	     Abonnement a5= new Abonnement (LocalDate.of(2022,10, 1) ,listeEmprunts3 );
-    	 Lecteur lecteur5= new Lecteur(254566899,"Imen","Massoudi",a5,20,5);
+    	 @SuppressWarnings("unused")
+		Lecteur lecteur5= new Lecteur(254566899,"Imen","Massoudi",a5,20,5);
 	     try {
 	    	
 			 //double d = lecteur5.calculer_credit(30);
