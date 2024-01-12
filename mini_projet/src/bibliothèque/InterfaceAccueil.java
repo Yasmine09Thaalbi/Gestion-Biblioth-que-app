@@ -1,103 +1,83 @@
 package bibliothèque;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javafx.application.Application;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class InterfaceAccueil extends JFrame {
+public class InterfaceAccueil extends Application {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public InterfaceAccueil() {
-        this.setTitle("Accueil");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000,1000);
-        setLocationRelativeTo(null);
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Accueil");
 
         // Titre
-        JLabel titleLabel = new JLabel("Bienvenue Dans Votre Application De Gestion De Bibliothèque");
-        titleLabel.setHorizontalAlignment(JLabel.CENTER);
-        titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.BOLD, titleLabel.getFont().getSize() + 15));
+        Label titleLabel = new Label("Bienvenue Dans Votre Application De Gestion De Bibliothèque");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
+        titleLabel.setWrapText(true);
 
         // Image
-        ImageIcon imageIcon = new ImageIcon("C:/Users/Yasmine/eclipse-workspace/mini_projet/src/bibliothèque/biblio.png");
-        Image image = imageIcon.getImage().getScaledInstance(410, 260, Image.SCALE_SMOOTH); 
-        ImageIcon resizedImageIcon = new ImageIcon(image);
-        JLabel imageLabel = new JLabel(resizedImageIcon);
-        imageLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        ImageView imageView = new ImageView(new Image("file:C:/Users/Yasmine/eclipse-workspace/mini_projet/src/bibliothèque/biblio.png"));
+        imageView.setFitWidth(390);
+        imageView.setFitHeight(260);
 
-        
-        
         // Boutons
-        JButton livreButton = new JButton("Gestion des Livres");
-        JButton lecteurButton = new JButton("Gestion des Lecteurs");
-        JButton empruntButton = new JButton("Gestion Emprunt / Retour");
-
-        Dimension buttonSize = new Dimension(250, 70);
-        livreButton.setPreferredSize(buttonSize);
-        lecteurButton.setPreferredSize(buttonSize);
-        empruntButton.setPreferredSize(buttonSize);
-        livreButton.setFont(new Font(livreButton.getFont().getName(), Font.BOLD, livreButton.getFont().getSize() + 5));
-        lecteurButton.setFont(new Font(lecteurButton.getFont().getName(), Font.BOLD, lecteurButton.getFont().getSize() + 5));
-        empruntButton.setFont(new Font(empruntButton.getFont().getName(), Font.BOLD, empruntButton.getFont().getSize() + 5));
+        Button livreButton = createButton("Gestion des Livres");
+        Button lecteurButton = createButton("Gestion des Lecteurs");
+        Button empruntButton = createButton("Gestion Emprunt / Retour");
 
         // Actions pour les boutons
-        livreButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new InterfaceLivre().setVisible(true);
-            }
-        });
-
-        lecteurButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new InterfaceLecteur().setVisible(true);
-            }
-        });
-
-        empruntButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new InterfaceEmpruntRetour().setVisible(true);
-            }
-        });
-
-        
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20)); 
-
-        buttonPanel.add(livreButton);
-        buttonPanel.add(lecteurButton);
-        buttonPanel.add(empruntButton);
-        
-        buttonPanel.setBorder(new EmptyBorder(50, 0, 0, 0));
+        livreButton.setOnAction(e -> new InterfaceLivre().start(new Stage()));
+        /*lecteurButton.setOnAction(e -> new InterfaceLecteur().start(new Stage()));
+        empruntButton.setOnAction(e -> new InterfaceEmpruntRetour().start(new Stage()));*/
 
         // Agencement principal
-        JPanel mainPanel = new JPanel(new GridLayout(3, 1)); 
+        GridPane mainPanel = new GridPane();
+        mainPanel.setHgap(10);
+        mainPanel.setVgap(50);
+        mainPanel.setPadding(new Insets(20, 20, 20, 20));
 
-        mainPanel.add(titleLabel);
-        mainPanel.add(imageLabel);
-        mainPanel.add(buttonPanel);
+        // Title Label
+        mainPanel.add(titleLabel, 0, 0, 3, 1);
+        GridPane.setHalignment(titleLabel, HPos.CENTER); // Center the title
 
-        mainPanel.setBackground(new Color(175, 216, 245));
+        // Image View
+        mainPanel.add(imageView, 0, 1, 3, 1);
+        GridPane.setHalignment(imageView, HPos.CENTER); // Center the image
 
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(mainPanel, BorderLayout.CENTER);
+        // Buttons
+        mainPanel.add(livreButton, 0, 2);
+        mainPanel.add(lecteurButton, 1, 2);
+        mainPanel.add(empruntButton, 2, 2);
 
+        mainPanel.setStyle("-fx-background-color: #afd8f5;");
+        mainPanel.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(mainPanel, 800, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private Button createButton(String text) {
+        Button button = new Button(text);
+        button.setPrefSize(250, 70);
+        button.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
+        return button;
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new InterfaceAccueil().setVisible(true);
-            }
-        });
+        launch(args);
     }
 }
+

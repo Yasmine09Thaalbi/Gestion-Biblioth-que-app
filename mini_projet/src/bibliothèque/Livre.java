@@ -1,5 +1,7 @@
 package bibliothèque;
 
+import javafx.beans.property.StringProperty;
+
 public class Livre {
 	private static long code_c = 0;
 	private long code ;
@@ -63,7 +65,7 @@ public class Livre {
 	public String getTitre() {
 		return titre;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Livre [code=" + code + ", titre=" + titre + ", auteur=" + auteur + ", isbn=" + ISBN + "]";

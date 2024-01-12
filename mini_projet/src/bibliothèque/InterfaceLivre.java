@@ -1,31 +1,204 @@
 package bibliothèque;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javafx.application.Application;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
-public class InterfaceLivre extends JFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private static final String BDD = "Bibliotheque";
-	private static final String url = "jdbc:mysql://localhost:3306/" + BDD;
-	private static final String username = "root";
-	private static final String password = "";
-	
+public class InterfaceLivre extends Application {
+    private static final String BDD = "Bibliotheque";
+    private static final String url = "jdbc:mysql://localhost:3306/" + BDD;
+    private static final String username = "root";
+    private static final String password = "";
+    
+    private TextField titreField;
+    private TextField auteurField;
+    private TextField isbnField;
+    private TextField descriptifField;
+    private TextField nomField;
+    private TextField nomDetectiveField;
+    private TextField nomVictimeField;
+    private TextField anneeField;
+    private TextField espaceField;
 
-	private static JTable tableLivres;
-	
+    private static TableView<Livre> tableLivres;
+
+	@Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Gestion des Livres");
+        primaryStage.setWidth(800);
+        primaryStage.setHeight(600);
+
+        // Using GridPane for the main panel
+        GridPane mainPanel = new GridPane();
+        mainPanel.setPadding(new Insets(10));
+        mainPanel.setHgap(10);
+        mainPanel.setVgap(10);
+
+        GridPane formulairePanel = new GridPane();
+        formulairePanel.setHgap(10);
+        formulairePanel.setVgap(10);
+
+        // Adding fields to the form
+        titreField = addLabelAndTextField(formulairePanel, "Titre* ", 0, "titreField");
+        auteurField = addLabelAndTextField(formulairePanel, "Auteur* ", 1, "auteurField");
+        isbnField = addLabelAndTextField(formulairePanel, "ISBN* ", 2, "isbnField");
+        descriptifField = addLabelAndTextField(formulairePanel, "Descriptif ", 3, "descriptifField");
+        nomField = addLabelAndTextField(formulairePanel, "Nom ", 4, "nomField");
+        nomDetectiveField = addLabelAndTextField(formulairePanel, "Nom du détective ", 5, "nomDetectiveField");
+        nomVictimeField = addLabelAndTextField(formulairePanel, "Nom de la victime ", 6, "nomVictimeField");
+        anneeField = addLabelAndTextField(formulairePanel, "Année ", 7, "anneeField");
+        espaceField = addLabelAndTextField(formulairePanel, "Espace ", 8, "espaceField");
+
+
+        // Adding buttons
+        Button ajouterButton = new Button("Ajouter");
+        Button supprimerButton = new Button("Supprimer");
+        Button rechercherButton = new Button("Rechercher");
+        Button afficherButton = new Button("Afficher");
+
+        ajouterButton.setOnAction(e -> {
+            String titre = titreField.getText();
+            String auteur = auteurField.getText();
+            long isbn = Long.parseLong(isbnField.getText()); 
+            String descriptif = descriptifField.getText();
+            String nomDetective = nomDetectiveField.getText();
+            String nomVictime = nomVictimeField.getText();
+            String nom = nomField.getText();
+            String anneeText = anneeField.getText();
+            String espace = espaceField.getText();
+
+            Livre livre;
+            if (!descriptif.isEmpty() && !nomDetective.isEmpty() && !nomVictime.isEmpty()) {
+                livre = new LivrePolicier( titre, auteur, isbn,descriptif, nomDetective, nomVictime);
+            } else if (!descriptif.isEmpty() && !nom.isEmpty()) {
+                livre = new LivreRomantique(titre, auteur,  isbn,descriptif, nom);
+            } else if (!anneeText.isEmpty() && !espace.isEmpty()) {
+                livre = new LivreScienceFiction(titre, auteur,isbn,Integer.parseInt(anneeText),espace );
+            } else {
+                livre = new Livre(titre, auteur,isbn);
+            }
+
+            try {
+                Connection con = DriverManager.getConnection(url, username, password);
+                System.out.println("Connected!");
+                ajouterLivre(con, livre);
+            } catch (SQLException ex) {
+            	System.out.println("not connected ! ");
+            }
+        });
+        
+        supprimerButton.setOnAction(e -> {
+            String titre = titreField.getText();
+            String auteur = auteurField.getText();
+            String isbnText = isbnField.getText(); 
+            String descriptif = descriptifField.getText();
+            String nomDetective = nomDetectiveField.getText();
+            String nomVictime = nomVictimeField.getText();
+            String nom = nomField.getText();
+            String anneeText = anneeField.getText();
+            String espace = espaceField.getText();
+
+            Livre livre;
+            if (!descriptifField.getText().isEmpty() && !nomDetectiveField.getText().isEmpty() && !nomVictimeField.getText().isEmpty()) {
+                livre = new LivrePolicier(titre,auteur,Long.parseLong(isbnText),descriptif,nomDetective,nomVictime);
+                
+            } else if (!descriptifField.getText().isEmpty() && !nomField.getText().isEmpty()) {
+                livre = new LivreRomantique(titre,auteur,Long.parseLong(isbnText),descriptif,nom);
+                
+            } else if (!anneeField.getText().isEmpty() && !espaceField.getText().isEmpty()) {
+                livre = new LivreScienceFiction(titre,auteur,Long.parseLong(isbnText),Integer.parseInt(anneeText),espace);
+                
+            } else {
+                livre = new Livre(titre,auteur,Long.parseLong(isbnText));
+            }
+
+            try (Connection con = DriverManager.getConnection(url, username, password)) {
+                System.out.println("Connected!");
+                supprimerLivre(con, livre);
+            } catch (SQLException ex) {
+            	System.out.println("not connected ! ");
+            }
+            	
+        });
+
+        
+        rechercherButton.setOnAction(e -> {
+            String titreText = titreField.getText();
+            String auteurText = auteurField.getText();
+            rechercherLivre(titreText, auteurText);
+        });
+        
+        
+        afficherButton.setOnAction(e -> afficherLivres());
+
+        
+        HBox boutonsPanel = new HBox(10);
+        boutonsPanel.getChildren().addAll(ajouterButton, supprimerButton, rechercherButton, afficherButton);
+
+        // Adding the form and buttons to the main panel
+        mainPanel.add(formulairePanel, 0, 0);
+        mainPanel.add(boutonsPanel, 0, 1);
+
+        // Adding the table view
+        tableLivres = new TableView<>();
+        TableColumn<Livre, Long> isbnColumn = new TableColumn<>("ISBN");
+        TableColumn<Livre, String> titreColumn = new TableColumn<>("Titre");
+        TableColumn<Livre, String> auteurColumn = new TableColumn<>("Auteur");
+
+        isbnColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getISBN()));
+        titreColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitre()));
+        auteurColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuteur()));
+
+        tableLivres.getColumns().addAll(isbnColumn, titreColumn, auteurColumn);
+        tableLivres.setRowFactory(tv -> {
+            TableRow<Livre> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Livre rowData = row.getItem();
+                }
+            });
+            return row;
+        });
+
+        Label noContentLabel = new Label("Cliquez sur 'Afficher' pour afficher le contenu.");
+        noContentLabel.setStyle("-fx-font-size: 14;");
+        tableLivres.setPlaceholder(noContentLabel);
+        
+        mainPanel.add(tableLivres, 0,2 );
+        mainPanel.setStyle("-fx-background-color: #afd8f5;");
+        mainPanel.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(mainPanel, 800, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    private TextField addLabelAndTextField(GridPane gridPane, String labelText, int row, String textFieldId) {
+        Label label = new Label(labelText);
+        TextField textField = new TextField();
+        textField.setId(textFieldId);
+        textField.setPromptText(labelText);
+
+        gridPane.add(label, 0, row);
+        gridPane.add(textField, 1, row);
+		return textField;
+    }
+    
+    
 	// Méthode pour vérifier si un livre existe déjà
     private static boolean livreExiste(Connection con, Livre livre) throws SQLException {
         String query = "SELECT COUNT(*) FROM Livre WHERE titre = ? AND auteur = ? AND ISBN = ?";
@@ -43,20 +216,22 @@ public class InterfaceLivre extends JFrame {
         return false;
     }
 
-
-	// Méthode pour ajouter un livre
     private static void ajouterLivre(Connection con, Livre livre) {
         try {
             String queryLivre = "INSERT INTO Livre (titre, auteur, ISBN) VALUES ('" + livre.getTitre() + "', '" + livre.getAuteur() + "', " + livre.getISBN() + ")";
             try (Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(queryLivre, Statement.RETURN_GENERATED_KEYS);
-                System.out.println("l'ajout du livre ! ");
+                
+                Alert alertInformation = new Alert(Alert.AlertType.INFORMATION);
+                alertInformation.setTitle("Information");
+                alertInformation.setHeaderText(null);
+                alertInformation.setContentText("Livre ajouté avec succès.");
+                alertInformation.showAndWait();
 
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         long generatedCode = generatedKeys.getLong(1);
 
-                        // Si c'est un livre policier, ajouter dans la table LivrePolicier
                         if (livre instanceof LivrePolicier) {
                             String queryPolicier = "INSERT INTO LivrePolicier (code, descriptif, nomDetective, nomVictime) VALUES (" + generatedCode + ", '"
                                     + ((LivrePolicier) livre).getDescriptif() + "', '" + ((LivrePolicier) livre).getNomDetective() + "', '"
@@ -65,8 +240,6 @@ public class InterfaceLivre extends JFrame {
                             System.out.println("l'ajout du livre Policier ! ");
                         }
                         
-                        
-                        // Si c'est un livre romantique, ajouter dans la table LivreRomantique
                         if (livre instanceof LivreRomantique) {
                             String queryRomantique = "INSERT INTO LivreRomantique (code, descriptif, nom) VALUES (" + generatedCode + ", '"
                                     + ((LivreRomantique) livre).getDescriptif() + "', '"+ ((LivreRomantique) livre).getNom() + "')";
@@ -74,7 +247,6 @@ public class InterfaceLivre extends JFrame {
                             System.out.println("l'ajout du livre Romantique ! ");
                         }
                         
-                        // Si c'est un livre Science Fiction, ajouter dans la table LivreScienceFiction
                         if (livre instanceof LivreScienceFiction) {
                             String queryScienceFiction = "INSERT INTO LivreScienceFiction (code, annee, espace) VALUES (" + generatedCode + ", "
                                     + ((LivreScienceFiction) livre).getAnnée() + ", '"+ ((LivreScienceFiction) livre).getEspace() + "')";
@@ -88,18 +260,38 @@ public class InterfaceLivre extends JFrame {
                     }
                 }
             }
+        
         }  catch (SQLException  e) {
-            e.printStackTrace();
-    
+        	 Alert alert = new Alert(Alert.AlertType.ERROR);
+             alert.setTitle("Erreur");
+             alert.setHeaderText(null);
+             alert.setContentText("La fonction d'ajout n'est pas réalisée ! ");
+             alert.showAndWait();
+            
         }
     }
+
 
     // Méthode pour supprimer un livre
     private static void supprimerLivre(Connection con, Livre livre) {
         try {
-            // Vérifier si le livre existe dans la base de données
+         	if ( livre.getTitre().isEmpty() && livre.getAuteur().isEmpty()  ) {
+      		  Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur");
+                alert.setHeaderText(null);
+                alert.setContentText("Champs vide ! Veuillez saisir le titre ou l'auteur livre à supprimer .");
+                alert.showAndWait();
+      		
+      	    }
+        	
+        	
             if (!livreExiste(con, livre)) {
                 System.out.println("Le livre n'existe pas dans la base de données.");
+                Alert alertInformation = new Alert(Alert.AlertType.INFORMATION);
+                alertInformation.setTitle("Information");
+                alertInformation.setHeaderText(null);
+                alertInformation.setContentText("Le livre n'existe pas dans la base de données.");
+                alertInformation.showAndWait();
                 return;
             }
 
@@ -143,46 +335,40 @@ public class InterfaceLivre extends JFrame {
                 try (Statement stmt = con.createStatement()) {
                     stmt.executeUpdate(queryLivre);
                     System.out.println("Le livre a été supprimé avec succès !");
+                    Alert alertInformation = new Alert(Alert.AlertType.INFORMATION);
+                    alertInformation.setTitle("Information");
+                    alertInformation.setHeaderText(null);
+                    alertInformation.setContentText("Le livre a été supprimé avec succès !");
+                    alertInformation.showAndWait();
+                    
                 }
             } else {
                 System.out.println("Erreur lors de la récupération du code du livre.");
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("La fonction de suppression n'est pas réalisée ! ");
+            alert.showAndWait();
            
         }
     }
 
-	 // Méthode pour afficher tous les livres de la table Livre
-    private static void afficherLivres(Connection con) {
-        String query = "SELECT * FROM Livre";
-        try (Statement stmt = con.createStatement();
-             ResultSet resultSet = stmt.executeQuery(query)) {
-
-            DefaultTableModel tableModel = new DefaultTableModel();
-            tableModel.setColumnIdentifiers(new String[]{"ISBN", "Titre", "Auteur"});
-            while (resultSet.next()) {
-                long isbn = resultSet.getLong("ISBN");
-                String titre = resultSet.getString("titre");
-                String auteur = resultSet.getString("auteur");
-
-                Object[] row = {isbn, titre, auteur};
-                tableModel.addRow(row);
-            }
-
-            tableLivres.setModel(tableModel);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Erreur lors de la récupération des livres.");
-        }
-    }
-
-
+    
+    
     // Méthode pour rechercher les livres par titre, auteur ou premières lettres du titre
-    private static void rechercherLivre(Connection con, String titre, String auteur, String isbnText) {
+    private static void rechercherLivre(String titre, String auteur) {
         try {
+        	if (titre.isEmpty() && auteur.isEmpty() ) {
+        		  Alert alert = new Alert(Alert.AlertType.ERROR);
+                  alert.setTitle("Erreur");
+                  alert.setHeaderText(null);
+                  alert.setContentText("Champs vide ! Veuillez saisir le titre ou l'auteur livre à chercher .");
+                  alert.showAndWait();
+        		
+        	}
             // Construire la requête de recherche en fonction des paramètres fournis
             StringBuilder queryBuilder = new StringBuilder("SELECT * FROM Livre WHERE");
             if (titre != null && !titre.isEmpty()) {
@@ -191,10 +377,7 @@ public class InterfaceLivre extends JFrame {
             if (auteur != null && !auteur.isEmpty()) {
                 queryBuilder.append(" auteur LIKE '%").append(auteur).append("%' AND");
             }
-            if (isbnText != null && !isbnText.isEmpty()) {
-                long isbn = Long.parseLong(isbnText);
-                queryBuilder.append(" ISBN = ").append(isbn).append(" AND");
-            }
+            
 
             // Supprimer le "AND" en trop à la fin de la requête
             int lastIndex = queryBuilder.lastIndexOf("AND");
@@ -203,291 +386,67 @@ public class InterfaceLivre extends JFrame {
             }
 
             // Exécuter la requête
-            try (Statement stmt = con.createStatement();
-                 ResultSet resultSet = stmt.executeQuery(queryBuilder.toString())) {
+            String query = queryBuilder.toString();
+            ObservableList<Livre> livresList = FXCollections.observableArrayList();
 
-                DefaultTableModel tableModel = new DefaultTableModel();
-                tableModel.setColumnIdentifiers(new String[]{"ISBN", "Titre", "Auteur"});
+            try (Connection con = DriverManager.getConnection(url, username, password);
+                 Statement stmt = con.createStatement();
+                 ResultSet resultSet = stmt.executeQuery(query)) {
+
                 while (resultSet.next()) {
                     long isbn = resultSet.getLong("ISBN");
                     String titreResult = resultSet.getString("titre");
                     String auteurResult = resultSet.getString("auteur");
 
-                    Object[] row = {isbn, titreResult, auteurResult};
-                    tableModel.addRow(row);
+                    Livre livre = new Livre();
+                    livre.setISBN(isbn);
+                    livre.setTitre(titreResult);
+                    livre.setAuteur(auteurResult);
+
+                    livresList.add(livre);
                 }
 
-                // Assurez-vous que tableLivres est correctement initialisée et associée à votre interface utilisateur
-                tableLivres.setModel(tableModel);
+                tableLivres.setItems(livresList);
 
             }
         } catch (SQLException | NumberFormatException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Champs vide ! Veuillez saisir le livre à chercher .", "Erreur", JOptionPane.ERROR_MESSAGE);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("La fonction de recherche n'est pas réalisée ! ");
+            alert.showAndWait();
         }
     }
+
     
-
-    private JTextField titreField, auteurField, isbnField, descriptifField, nomDetectiveField, nomVictimeField, nomField, anneeField, espaceField;
     
-    public InterfaceLivre() {
-        setTitle("Gestion des Livres");
-        setSize(800, 600);
- 
-        // Utilisation de GridBagLayout pour le panneau principal
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); 
+    private void afficherLivres() {
+    	    String query = "SELECT * FROM Livre";
+    	    ObservableList<Livre> livresList = FXCollections.observableArrayList();
 
-        JPanel formulairePanel = new JPanel();
-        formulairePanel.setLayout(new GridLayout(10, 2));
+    	    try (Connection con = DriverManager.getConnection(url, username, password);
+    	         Statement stmt = con.createStatement();
+    	         ResultSet resultSet = stmt.executeQuery(query)) {
 
-        // Ajout des champs au formulaire
-        JLabel titleLabel = new JLabel("Titre* :");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(titleLabel);
-        titreField = new JTextField();
-        titreField.setColumns(20);
-        titreField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(titreField);
+    	        while (resultSet.next()) {
+    	            long isbn = resultSet.getLong("ISBN");
+    	            String titre = resultSet.getString("titre");
+    	            String auteur = resultSet.getString("auteur");
 
-        JLabel auteurLabel = new JLabel("Auteur* :");
-        auteurLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(auteurLabel);
-        auteurField = new JTextField();
-        auteurField.setColumns(20);
-        auteurField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(auteurField);
-        
-        
-        JLabel isbnLabel = new JLabel("ISBN* :");
-        isbnLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(isbnLabel);
-        isbnField = new JTextField();
-        isbnField.setColumns(20);
-        isbnField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(isbnField);
+    	            Livre livre = new Livre();
+    	            livre.setISBN(isbn);
+    	            livre.setTitre(titre);
+    	            livre.setAuteur(auteur);
 
-        
-        
-        JLabel descriptifLabel = new JLabel("Descriptif :");
-        descriptifLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(descriptifLabel);
-        descriptifField = new JTextField();
-        descriptifField.setColumns(20);
-        isbnField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(descriptifField);
-        
-        
-        JLabel nomLabel = new JLabel("Nom :");
-        nomLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(nomLabel);
-        nomField = new JTextField();
-        nomField.setColumns(20);
-        nomField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(nomField);
+    	            livresList.add(livre);
+    	        }
 
-        
-        JLabel nomDetectiveLabel = new JLabel("Nom du détective :");
-        nomDetectiveLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(nomDetectiveLabel);
-        nomDetectiveField = new JTextField();
-        nomDetectiveField.setColumns(20);
-        nomDetectiveField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(nomDetectiveField);
+    	        tableLivres.setItems(livresList);
 
-        
-        JLabel nomVictimeLabel = new JLabel("Nom de la victime :");
-        nomVictimeLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(nomVictimeLabel);
-        nomVictimeField = new JTextField();
-        nomVictimeField.setColumns(20);
-        nomVictimeField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(nomVictimeField);
-
-
-        JLabel anneeLabel = new JLabel("Année :");
-        anneeLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(anneeLabel);
-        anneeField = new JTextField();
-        anneeField.setColumns(20);
-        anneeField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(anneeField);
-
-        
-        JLabel espaceLabel = new JLabel("Espace :");
-        espaceLabel.setFont(new Font("Arial", Font.BOLD, 15));  
-        formulairePanel.add(espaceLabel);
-        espaceField = new JTextField();
-        espaceField.setColumns(20);
-        espaceField.setPreferredSize(new Dimension(150, 25));
-        formulairePanel.add(espaceField);
-
-        // Ajout des boutons
-        JButton ajouterButton = new JButton("Ajouter");
-        ajouterButton.setPreferredSize(new Dimension(80, 30));
-        JButton supprimerButton = new JButton("Supprimer");
-        JButton rechercherButton = new JButton("Rechercher");
-        JButton afficherButton = new JButton("Afficher");
-
-        // Ajout des actions aux boutons
-        ajouterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	 // Récupérer les valeurs des champs de texte
-                String titre = titreField.getText();
-                String auteur = auteurField.getText();
-                long isbn = Long.parseLong(isbnField.getText()); // Vous pouvez gérer les erreurs de conversion
-                String descriptif = descriptifField.getText();
-                String nomDetective = nomDetectiveField.getText();
-                String nomVictime = nomVictimeField.getText();
-                String nom = nomField.getText();
-                String anneeText = anneeField.getText();
-                String espace = espaceField.getText();
-
-                // Créer un objet Livre avec les valeurs récupérées
-                Livre livre;
-                if (!descriptif.isEmpty() && !nomDetective.isEmpty() && !nomVictime.isEmpty()) {
-                    livre = new LivrePolicier( titre, auteur, isbn,descriptif, nomDetective, nomVictime);
-                } else if (!descriptif.isEmpty() && !nom.isEmpty()) {
-                    livre = new LivreRomantique(titre, auteur,  isbn,descriptif, nom);
-                } else if (!anneeText.isEmpty() && !espace.isEmpty()) {
-                    livre = new LivreScienceFiction(titre, auteur,isbn,Integer.parseInt(anneeText),espace );
-                } else {
-                    livre = new Livre(titre, auteur,isbn);
-                }
-
-                // Appeler la méthode pour ajouter le livre
-                try {
-                    Connection con = DriverManager.getConnection(url, username, password);
-                    System.out.println("Connected!");
-                    ajouterLivre(con, livre);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(InterfaceLivre.this, "Erreur lors de l'ajout du livre.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        supprimerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	 // Récupérer les valeurs des champs de texte
-                String titre = titreField.getText();
-                String auteur = auteurField.getText();
-                String isbnText = isbnField.getText(); // Vous pouvez gérer les erreurs de conversion
-                String descriptif = descriptifField.getText();
-                String nomDetective = nomDetectiveField.getText();
-                String nomVictime = nomVictimeField.getText();
-                String nom = nomField.getText();
-                String anneeText = anneeField.getText();
-                String espace = espaceField.getText();
-
-                // Créer un objet Livre avec les valeurs récupérées
-                Livre livre;
-                if (!descriptif.isEmpty() && !nomDetective.isEmpty() && !nomVictime.isEmpty()) {
-                    livre = new LivrePolicier(descriptif, nomDetective, Long.parseLong(isbnText), titre, auteur, nomVictime);
-                } else if (!descriptif.isEmpty() && !nom.isEmpty()) {
-                    livre = new LivreRomantique(titre, auteur,  Long.parseLong(isbnText),descriptif, nom);
-                } else if (!anneeText.isEmpty() && !espace.isEmpty()) {
-                    livre = new LivreScienceFiction(titre, auteur,Long.parseLong(isbnText),Integer.parseInt(anneeText),espace );
-                } else {
-                    livre = new Livre(titre, auteur,Long.parseLong(isbnText));
-                }
-
-                // Appeler la méthode pour ajouter le livre
-                try {
-                    Connection con = DriverManager.getConnection(url, username, password);
-                    System.out.println("Connected!");
-                    supprimerLivre(con, livre);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(InterfaceLivre.this, "Erreur lors de la suppression du livre.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-              
-            }
-        });
-
-        rechercherButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String titreRecherche = titreField.getText();
-                String auteurRecherche = auteurField.getText();
-                String isbnRecherche = isbnField.getText();
-
-                try {
-                    Connection con = DriverManager.getConnection(url, username, password);
-                    System.out.println("Connected!");
-                    rechercherLivre(con, titreRecherche, auteurRecherche, isbnRecherche);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(InterfaceLivre.this, "Erreur lors de la recherche du livre.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        
-        afficherButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	   try {
-                       Connection con = DriverManager.getConnection(url, username, password);
-                       System.out.println("Connected!");
-                       afficherLivres(con);
-                   } catch (SQLException ex) {
-                       ex.printStackTrace();
-                       JOptionPane.showMessageDialog(InterfaceLivre.this, "Erreur lors de l'affichage des livres.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                   }
-            }
-        });
-
-
-        JPanel boutonsPanel = new JPanel(new GridLayout(1, 4));
-        boutonsPanel.add(ajouterButton);
-        boutonsPanel.add(supprimerButton);
-        boutonsPanel.add(rechercherButton);
-        boutonsPanel.add(afficherButton);
-        
-
-        // Ajout du formulairePanel au mainPanel avec des contraintes pour centrer
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        mainPanel.add(formulairePanel, gbc);
-        formulairePanel.setBackground(new Color(175, 216, 245));
-
-        // Ajout des boutonsPanel au mainPanel avec des contraintes pour centrer
-        gbc.gridy = -1;
-        mainPanel.add(boutonsPanel, gbc);
-        mainPanel.setBackground(new Color(175, 216, 245));
-        boutonsPanel.setBackground(new Color(175, 216, 245));
-
-    	tableLivres = new JTable();
-    	tableLivres.setRowHeight(30); 
-    	JScrollPane sp=new JScrollPane(tableLivres); 
-    	sp.setBackground(new Color(204, 229, 255)); 
-    	sp.getViewport().setBackground(new Color(175, 216, 245));
-    	sp.setBorder(BorderFactory.createEmptyBorder());
-    	sp.setViewportBorder(null);
-
- 
-        gbc.gridy = -2;
-        mainPanel.add(sp, gbc);
-        
-        // Add an EmptyBorder to mainPanel
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(80, 0, 0, 0));
-
-        // Add mainPanel to the NORTH position
-        getContentPane().add(BorderLayout.NORTH, mainPanel);
-        // Centrez la fenêtre sur l'écran
-        setLocationRelativeTo(null);
-        
-
+    	    } catch (SQLException e) {
+    	        System.out.println("Erreur lors de la récupération des livres.");
+    	    }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new InterfaceLivre().setVisible(true);
-            }
-        });
-    }
 }
+
