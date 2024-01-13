@@ -103,4 +103,41 @@ public class Lecteur {
 
 
 
+
+	public void setCIN(long cIN) {
+		CIN = cIN;
+	}
+
+
+
+
+	public void setPrenom(String prenom) {
+		this.prenom = prenom;
+	}
+
+
+
+
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+
+
+
+
+	public void setAb(Abonnement ab) {
+		Ab = ab;
+	}
+
+
+
+
+	public void setSomme_cumle(double somme_cumle) {
+		this.somme_cumle = somme_cumle;
+	}
+	
+	
+
+
+
 }

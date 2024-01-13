@@ -39,8 +39,8 @@ public class InterfaceAccueil extends Application {
 
         // Actions pour les boutons
         livreButton.setOnAction(e -> new InterfaceLivre().start(new Stage()));
-        /*lecteurButton.setOnAction(e -> new InterfaceLecteur().start(new Stage()));
-        empruntButton.setOnAction(e -> new InterfaceEmpruntRetour().start(new Stage()));*/
+        lecteurButton.setOnAction(e -> new InterfaceLecteur().start(new Stage()));
+        /*empruntButton.setOnAction(e -> new InterfaceEmpruntRetour().start(new Stage()));*/
 
         // Agencement principal
         GridPane mainPanel = new GridPane();
