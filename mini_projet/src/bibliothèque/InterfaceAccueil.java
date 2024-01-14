@@ -9,12 +9,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 
 public class InterfaceAccueil extends Application {
 
@@ -40,7 +36,7 @@ public class InterfaceAccueil extends Application {
         // Actions pour les boutons
         livreButton.setOnAction(e -> new InterfaceLivre().start(new Stage()));
         lecteurButton.setOnAction(e -> new InterfaceLecteur().start(new Stage()));
-        /*empruntButton.setOnAction(e -> new InterfaceEmpruntRetour().start(new Stage()));*/
+        empruntButton.setOnAction(e -> new InterfaceEmpruntRetour().start(new Stage()));
 
         // Agencement principal
         GridPane mainPanel = new GridPane();
@@ -50,11 +46,11 @@ public class InterfaceAccueil extends Application {
 
         // Title Label
         mainPanel.add(titleLabel, 0, 0, 3, 1);
-        GridPane.setHalignment(titleLabel, HPos.CENTER); // Center the title
+        GridPane.setHalignment(titleLabel, HPos.CENTER);
 
         // Image View
         mainPanel.add(imageView, 0, 1, 3, 1);
-        GridPane.setHalignment(imageView, HPos.CENTER); // Center the image
+        GridPane.setHalignment(imageView, HPos.CENTER);
 
         // Buttons
         mainPanel.add(livreButton, 0, 2);
@@ -80,4 +76,3 @@ public class InterfaceAccueil extends Application {
         launch(args);
     }
 }
-
