@@ -132,6 +132,9 @@ public class InterfaceLecteur extends Application{
 	        TableColumn<Lecteur, Long> cinColumn = new TableColumn<>("CIN");
 	        TableColumn<Lecteur, String> prenomColumn = new TableColumn<>("Prenom");
 	        TableColumn<Lecteur, String> nomColumn = new TableColumn<>("Nom");
+	        
+
+
 
 	        cinColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getCIN()));
 	        prenomColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPrenom()));

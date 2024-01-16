@@ -4,61 +4,105 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JSONObject {
-    private final Map<String, Object> data;
+    private Map<String, Object> map;
 
     public JSONObject() {
-        this.data = new HashMap<>();
+        map = new HashMap<>();
     }
 
     public void put(String key, Object value) {
-        data.put(key, value);
+        map.put(key, value);
     }
 
     public Object get(String key) {
-        return data.get(key);
+        return map.get(key);
     }
 
-    public boolean containsKey(String key) {
-        return data.containsKey(key);
+    public String getString(String key) {
+        Object value = get(key);
+        return (value instanceof String) ? (String) value : null;
     }
 
-    public static JSONObject parse(String jsonString) {
-        JSONObject jsonObject = new JSONObject();
-
-        jsonString = jsonString.substring(1, jsonString.length() - 1); // Remove external braces
-        String[] keyValuePairs = jsonString.split(",");
-        
-        for (String pair : keyValuePairs) {
-            String[] entry = pair.split(":", 2); // Split into key and value (limit to 2 parts)
-            String key = entry[0].trim().replace("\"", ""); // Trim and remove quotes for the key
-
-            // Remove quotes for the value if it is a string
-            String value = entry[1].trim();
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                value = value.substring(1, value.length() - 1);
-            }
-
-            jsonObject.put(key, value);
-        }
-
-        return jsonObject;
+    public int getInt(String key) {
+        Object value = get(key);
+        return (value instanceof Number) ? ((Number) value).intValue() : 0;
     }
+    
+    public long getLong(String key) {
+        Object value = get(key);
+        return (value instanceof Number) ? ((Number) value).longValue() : 0;
+    }
+
+    public boolean getBoolean(String key) {
+        Object value = get(key);
+        return (value instanceof Boolean) && (Boolean) value;
+    }
+
+    // Other methods can be added based on your requirements
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("{");
-
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-            result.append("\"").append(entry.getKey()).append("\":\"").append(entry.getValue()).append("\",");
+        boolean first = true;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (!first) {
+                result.append(", ");
+            }
+            result.append("\"").append(entry.getKey()).append("\": ");
+            if (entry.getValue() instanceof String) {
+                result.append("\"").append(entry.getValue()).append("\"");
+            } else {
+                result.append(entry.getValue());
+            }
+            first = false;
         }
-
-        // Remove the trailing comma if there are entries
-        if (result.length() > 1) {
-            result.setLength(result.length() - 1);
-        }
-
         result.append("}");
-
         return result.toString();
     }
+    
+    public boolean containsKey(String key) {
+        return map.containsKey(key);
+    }
+    
+	 public static JSONObject parse(String jsonString) {
+	    JSONObject jsonObject = new JSONObject();
+	    try {
+	        // Assuming the input string is in a simple key-value pair format
+	        // Example: {"key1": "value1", "key2": 123, "key3": true}
+	        jsonString = jsonString.trim().substring(1, jsonString.length() - 1);
+	        String[] pairs = jsonString.split(",\\s*");
+	
+	        for (String pair : pairs) {
+	            String[] keyValue = pair.split(":");
+	            String key = keyValue[0].trim().replaceAll("\"", "");
+	            String valueString = keyValue[1].trim();
+	
+	            if (valueString.startsWith("\"") && valueString.endsWith("\"")) {
+	                // String value
+	                String value = valueString.substring(1, valueString.length() - 1);
+	                jsonObject.put(key, value);
+	            } else if (valueString.equalsIgnoreCase("true") || valueString.equalsIgnoreCase("false")) {
+	                // Boolean value
+	                boolean value = Boolean.parseBoolean(valueString);
+	                jsonObject.put(key, value);
+	            } else if (valueString.matches("-?\\d+\\.\\d+")) {
+	                // Double value
+	                double doubleValue = Double.parseDouble(valueString);
+	                jsonObject.put(key, doubleValue);
+	            } else if (valueString.matches("-?\\d+")) {
+	                // Long value
+	                long longValue = Long.parseLong(valueString);
+	                jsonObject.put(key, longValue);
+	            } else {
+	                // Handle other cases as needed
+	                System.out.println("Unhandled value: " + valueString);
+	            }
+	        }
+	
+	    } catch (Exception e) {
+	        System.out.println("Error parsing JSON string: " + e.getMessage());
+	    }
+	    return jsonObject;
+	}
+
 }

@@ -86,15 +86,17 @@ public class InterfaceEmpruntRetour extends Application {
              
              try (Connection con = DriverManager.getConnection(url, username, password)) {
                  System.out.println("Connected!");
-                 if (cinLecteur.matches("\\d+")) 
+                 if (!cinLecteur.isEmpty()) {
                      emprunterLivre(con, titreLivre, Long.parseLong(cinLecteur));
-                 else {
-                         Alert alert = new Alert(Alert.AlertType.ERROR);
-                         alert.setTitle("Erreur");
-                         alert.setHeaderText(null);
-                         alert.setContentText("Le CIN du lecteur doit être un nombre.");
-                         alert.showAndWait();
-                     }
+                 } else {
+                     // Handle the case when cinLecteur is empty
+                     Alert alert = new Alert(Alert.AlertType.ERROR);
+                     alert.setTitle("Erreur");
+                     alert.setHeaderText(null);
+                     alert.setContentText("Le champ CIN du lecteur est vide. Veuillez saisir le CIN du lecteur.");
+                     alert.showAndWait();
+                 }
+
              } catch (SQLException ex) {
              	System.out.println("not connected ! ");
              }
@@ -106,15 +108,17 @@ public class InterfaceEmpruntRetour extends Application {
             
             try (Connection con = DriverManager.getConnection(url, username, password)) {
                 System.out.println("Connected!");
-                if (cinLecteurRetour.matches("\\d+")) 
-                	retournerLivre(con, titreLivreRetour, Long.parseLong(cinLecteurRetour));
-                else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Erreur");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Le CIN du lecteur doit être un nombre.");
-                        alert.showAndWait();
-                    }
+                if (!cinLecteurRetour.isEmpty()) {
+                	retournerLivre(con, titreLivreRetour,(long) Long.parseLong(cinLecteurRetour));
+                } else {
+                    // Handle the case when cinLecteur is empty
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Erreur");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Le champ CIN du lecteur est vide. Veuillez saisir le CIN du lecteur.");
+                    alert.showAndWait();
+                }
+                
             } catch (SQLException ex) {
             	System.out.println("not connected ! ");
             }
@@ -414,21 +418,18 @@ public class InterfaceEmpruntRetour extends Application {
                          String livreJsonString = resultSetDetailsLivre.getString("livre");
                          System.out.println(livreJsonString);
 
-                         // Convertir la chaîne JSON en objet JSON
+                         // Convertir la chaîne en objet JSON
                          JSONObject detailsLivreJson = JSONObject.parse(livreJsonString);
                          System.out.println(detailsLivreJson);
-                         
-                 
-                         
+
 
                          // Réinsérer le livre dans la table Livre
                          String queryInsererLivre = "INSERT INTO Livre (code, titre, auteur, isbn) VALUES (?, ?, ?, ?)";
                          try (PreparedStatement preparedStatementInsererLivre = con.prepareStatement(queryInsererLivre)) {
-                             preparedStatementInsererLivre.setLong(1, (long) detailsLivreJson.get("code"));
-                             System.out.println((long) detailsLivreJson.get("code"));
+                             preparedStatementInsererLivre.setLong(1, detailsLivreJson.getLong("code"));
                              preparedStatementInsererLivre.setString(2, (String) detailsLivreJson.get("titre"));
                              preparedStatementInsererLivre.setString(3, (String) detailsLivreJson.get("auteur"));
-                             preparedStatementInsererLivre.setLong(4, (long) detailsLivreJson.get("isbn"));
+                             preparedStatementInsererLivre.setLong(4, detailsLivreJson.getLong("isbn"));
 
                              preparedStatementInsererLivre.executeUpdate();
                          }
@@ -437,7 +438,7 @@ public class InterfaceEmpruntRetour extends Application {
                          if (detailsLivreJson.containsKey("descriptifRomantique")) {
                              String queryInsererLivreRomantique = "INSERT INTO livreromantique (code, descriptif, nom) VALUES (?, ?, ?)";
                              try (PreparedStatement preparedStatementInsererLivreRomantique = con.prepareStatement(queryInsererLivreRomantique)) {
-                                 preparedStatementInsererLivreRomantique.setLong(1, (long) detailsLivreJson.get("code"));
+                                 preparedStatementInsererLivreRomantique.setLong(1, detailsLivreJson.getLong("code"));
                                  preparedStatementInsererLivreRomantique.setString(2, (String) detailsLivreJson.get("descriptifRomantique"));
                                  preparedStatementInsererLivreRomantique.setString(3, (String) detailsLivreJson.get("nomRomantique"));
 
@@ -446,7 +447,7 @@ public class InterfaceEmpruntRetour extends Application {
                          } else if (detailsLivreJson.containsKey("descriptifPolicier")) {
                              String queryInsererLivrePolicier = "INSERT INTO livrepolicier (code, descriptif, nomDetective, nomVictime) VALUES (?, ?, ?, ?)";
                              try (PreparedStatement preparedStatementInsererLivrePolicier = con.prepareStatement(queryInsererLivrePolicier)) {
-                                 preparedStatementInsererLivrePolicier.setLong(1, (long) detailsLivreJson.get("code"));
+                                 preparedStatementInsererLivrePolicier.setLong(1, detailsLivreJson.getLong("code"));
                                  preparedStatementInsererLivrePolicier.setString(2, (String) detailsLivreJson.get("descriptifPolicier"));
                                  preparedStatementInsererLivrePolicier.setString(3, (String) detailsLivreJson.get("nomDetective"));
                                  preparedStatementInsererLivrePolicier.setString(4, (String) detailsLivreJson.get("nomVictime"));
@@ -456,7 +457,7 @@ public class InterfaceEmpruntRetour extends Application {
                          } else if (detailsLivreJson.containsKey("annee")) {
                              String queryInsererLivreScienceFiction = "INSERT INTO livresciencefiction (code, annee, espace) VALUES (?, ?, ?)";
                              try (PreparedStatement preparedStatementInsererLivreScienceFiction = con.prepareStatement(queryInsererLivreScienceFiction)) {
-                                 preparedStatementInsererLivreScienceFiction.setLong(1, (long) detailsLivreJson.get("code"));
+                                 preparedStatementInsererLivreScienceFiction.setLong(1, detailsLivreJson.getLong("code"));
                                  preparedStatementInsererLivreScienceFiction.setInt(2, (int) detailsLivreJson.get("annee"));
                                  preparedStatementInsererLivreScienceFiction.setString(3, (String) detailsLivreJson.get("espace"));
 

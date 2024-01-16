@@ -154,6 +154,13 @@ public class InterfaceLivre extends Application {
         TableColumn<Livre, Long> isbnColumn = new TableColumn<>("ISBN");
         TableColumn<Livre, String> titreColumn = new TableColumn<>("Titre");
         TableColumn<Livre, String> auteurColumn = new TableColumn<>("Auteur");
+        
+        isbnColumn.setPrefWidth(100); 
+        titreColumn.setPrefWidth(120); 
+        auteurColumn.setPrefWidth(90); 
+
+        // Set overall preferred width for the TableView
+        tableLivres.setPrefWidth(isbnColumn.getPrefWidth() + titreColumn.getPrefWidth() + auteurColumn.getPrefWidth());
 
         isbnColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getISBN()));
         titreColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitre()));
