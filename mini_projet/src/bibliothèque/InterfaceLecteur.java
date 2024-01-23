@@ -65,26 +65,36 @@ public class InterfaceLecteur extends Application{
 	        Button supprimerButton = new Button("Supprimer");
 	        Button rechercherButton = new Button("Rechercher");
 	        Button afficherButton = new Button("Afficher");
+	        afficherButton.setPrefWidth(100); 
 
 	        ajouterButton.setOnAction(e -> {
-	        	  long cin = Long.parseLong(cinField.getText()); 
+	        	  String cin = cinField.getText(); 
                   String nom = nomField.getText();
                   String prenom = prenomField.getText();
-                  double sommeCumule = Double.parseDouble(sommeField.getText()); 
+                  String sommeCumule =sommeField.getText(); 
                   String adresseEmail = adresse_emailField.getText();
                   String préférence = préférenceField.getText();
                   String dateCreationAbonnement = dateCreationAbonnementField.getText(); 
-                  double fraisAbonnement = Double.parseDouble(fraisAbonnementField.getText()); 
-
+                  String fraisAbonnement =fraisAbonnementField.getText(); 
+                  
+               	  if (cin.isEmpty() && nom.isEmpty() && prenom.isEmpty() && sommeCumule.isEmpty() && adresseEmail.isEmpty() && 
+               			préférence.isEmpty() && dateCreationAbonnement.isEmpty() &&  fraisAbonnement.isEmpty() ) {
+	        		  Alert alert = new Alert(Alert.AlertType.ERROR);
+	                  alert.setTitle("Erreur");
+	                  alert.setHeaderText(null);
+	                  alert.setContentText("Champs vide ! Veuillez saisir les champs .");
+	                  alert.showAndWait();
+		    	  }
+ 
                   DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/d");
 
-                  Abonnement abonnement = new Abonnement(LocalDate.parse(dateCreationAbonnement,formatter), fraisAbonnement);
+                  Abonnement abonnement = new Abonnement(LocalDate.parse(dateCreationAbonnement,formatter), Double.parseDouble(fraisAbonnement));
 
                   Lecteur lecteur;
                   if (!adresseEmail.isEmpty() && !préférence.isEmpty()) {
-                      lecteur = new LecteurFidèle(cin, prenom, nom, abonnement, sommeCumule, adresseEmail, préférence);
+                      lecteur = new LecteurFidèle(Long.parseLong(cin), prenom, nom, abonnement, Double.parseDouble(sommeCumule), adresseEmail, préférence);
                   } else {
-                      lecteur = new Lecteur(cin, prenom, nom, abonnement,sommeCumule);
+                      lecteur = new Lecteur(Long.parseLong(cin), prenom, nom, abonnement,Double.parseDouble(sommeCumule));
                   }
 
                   try {
@@ -98,10 +108,18 @@ public class InterfaceLecteur extends Application{
 	        });
 	        
 	        supprimerButton.setOnAction(e -> {
-	        	 long cin = Long.parseLong(cinField.getText());
-                 Lecteur lecteur = new Lecteur(cin);
+	        	 String cin = cinField.getText();
                  
-                 
+             	  if (cin.isEmpty() ) {
+  	        		  Alert alert = new Alert(Alert.AlertType.ERROR);
+  	                  alert.setTitle("Erreur");
+  	                  alert.setHeaderText(null);
+  	                  alert.setContentText("Champs CIN vide ! Veuillez saisir le CIN du lecteur à supprimer .");
+  	                  alert.showAndWait();
+  		    	  }
+   
+                  Lecteur lecteur = new Lecteur(Long.parseLong(cin));
+              
                  try (Connection con = DriverManager.getConnection(url, username, password)) {
                      System.out.println("Connected!");
                      supprimerLecteur(con, lecteur);
@@ -111,10 +129,10 @@ public class InterfaceLecteur extends Application{
 	        });
 
 	        rechercherButton.setOnAction(e ->  {
-	        String nomText = nomField.getText();
-            String prenomText =  prenomField.getText();
-            String cinText = cinField.getText();
-            rechercherLecteur(nomText, prenomText, cinText);
+		        String nomText = nomField.getText();
+	            String prenomText =  prenomField.getText();
+	            String cinText = cinField.getText();
+	            rechercherLecteur(nomText, prenomText, cinText);
             });
 	        
 	        afficherButton.setOnAction(e -> afficherLecteurs());
@@ -132,13 +150,14 @@ public class InterfaceLecteur extends Application{
 	        TableColumn<Lecteur, Long> cinColumn = new TableColumn<>("CIN");
 	        TableColumn<Lecteur, String> prenomColumn = new TableColumn<>("Prenom");
 	        TableColumn<Lecteur, String> nomColumn = new TableColumn<>("Nom");
-	        
-
-
 
 	        cinColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getCIN()));
 	        prenomColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPrenom()));
 	        nomColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNom()));
+	        
+	        cinColumn.setPrefWidth(100);
+	        prenomColumn.setPrefWidth(120);
+	        nomColumn.setPrefWidth(120);
 
 	        tableLecteurs.getColumns().addAll(cinColumn, prenomColumn, nomColumn);
 	        tableLecteurs.setRowFactory(tv -> {

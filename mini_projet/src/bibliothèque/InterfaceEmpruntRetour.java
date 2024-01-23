@@ -84,6 +84,14 @@ public class InterfaceEmpruntRetour extends Application {
         	 String titreLivre = livreField.getText();
              String cinLecteur = lecteurField.getText();
              
+             if (cinLecteur.isEmpty() && titreLivre.isEmpty()) {
+                 Alert alert = new Alert(Alert.AlertType.ERROR);
+                 alert.setTitle("Erreur");
+                 alert.setHeaderText(null);
+                 alert.setContentText("Champs vides ! Veuillez saisir les champs.");
+                 alert.showAndWait();
+             }
+             
              try (Connection con = DriverManager.getConnection(url, username, password)) {
                  System.out.println("Connected!");
                  if (!cinLecteur.isEmpty()) {
@@ -105,6 +113,15 @@ public class InterfaceEmpruntRetour extends Application {
         retournerButton.setOnAction(e -> {
         	String titreLivreRetour = retourLivreField.getText();
             String cinLecteurRetour = retourLecteurField.getText();
+            
+            if (cinLecteurRetour.isEmpty() && titreLivreRetour.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur");
+                alert.setHeaderText(null);
+                alert.setContentText("Champs vides ! Veuillez saisir les champs.");
+                alert.showAndWait();
+            }
+            
             
             try (Connection con = DriverManager.getConnection(url, username, password)) {
                 System.out.println("Connected!");

@@ -69,23 +69,33 @@ public class InterfaceLivre extends Application {
         ajouterButton.setOnAction(e -> {
             String titre = titreField.getText();
             String auteur = auteurField.getText();
-            long isbn = Long.parseLong(isbnField.getText()); 
+            String isbn = isbnField.getText(); 
             String descriptif = descriptifField.getText();
             String nomDetective = nomDetectiveField.getText();
             String nomVictime = nomVictimeField.getText();
             String nom = nomField.getText();
             String anneeText = anneeField.getText();
             String espace = espaceField.getText();
+            
+        	if (titre.isEmpty() && auteur.isEmpty() && isbnField.getText().isEmpty() && descriptif.isEmpty() && nomDetective.isEmpty() && nomVictime.isEmpty() 
+        			&& nom.isEmpty() && anneeText.isEmpty() &&  espace.isEmpty()) {
+        		  Alert alert = new Alert(Alert.AlertType.ERROR);
+                  alert.setTitle("Erreur");
+                  alert.setHeaderText(null);
+                  alert.setContentText("Champs vide ! Veuillez saisir les champs .");
+                  alert.showAndWait();
+        		
+        	}
 
             Livre livre;
             if (!descriptif.isEmpty() && !nomDetective.isEmpty() && !nomVictime.isEmpty()) {
-                livre = new LivrePolicier( titre, auteur, isbn,descriptif, nomDetective, nomVictime);
+                livre = new LivrePolicier( titre, auteur, Long.parseLong(isbn),descriptif, nomDetective, nomVictime);
             } else if (!descriptif.isEmpty() && !nom.isEmpty()) {
-                livre = new LivreRomantique(titre, auteur,  isbn,descriptif, nom);
+                livre = new LivreRomantique(titre, auteur, Long.parseLong(isbn),descriptif, nom);
             } else if (!anneeText.isEmpty() && !espace.isEmpty()) {
-                livre = new LivreScienceFiction(titre, auteur,isbn,Integer.parseInt(anneeText),espace );
+                livre = new LivreScienceFiction(titre, auteur,Long.parseLong(isbn),Integer.parseInt(anneeText),espace );
             } else {
-                livre = new Livre(titre, auteur,isbn);
+                livre = new Livre(titre, auteur, Long.parseLong(isbn));
             }
 
             try {
@@ -107,6 +117,16 @@ public class InterfaceLivre extends Application {
             String nom = nomField.getText();
             String anneeText = anneeField.getText();
             String espace = espaceField.getText();
+            
+        	if (titre.isEmpty() && auteur.isEmpty() && isbnField.getText().isEmpty() && descriptif.isEmpty() && nomDetective.isEmpty() && nomVictime.isEmpty() 
+        			&& nom.isEmpty() && anneeText.isEmpty() &&  espace.isEmpty()) {
+        		  Alert alert = new Alert(Alert.AlertType.ERROR);
+                  alert.setTitle("Erreur");
+                  alert.setHeaderText(null);
+                  alert.setContentText("Champs vide ! Veuillez saisir les champs .");
+                  alert.showAndWait();
+        		
+        	}
 
             Livre livre;
             if (!descriptifField.getText().isEmpty() && !nomDetectiveField.getText().isEmpty() && !nomVictimeField.getText().isEmpty()) {
@@ -282,16 +302,6 @@ public class InterfaceLivre extends Application {
     // Méthode pour supprimer un livre
     private static void supprimerLivre(Connection con, Livre livre) {
         try {
-         	if ( livre.getTitre().isEmpty() && livre.getAuteur().isEmpty()  ) {
-      		  Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Erreur");
-                alert.setHeaderText(null);
-                alert.setContentText("Champs vide ! Veuillez saisir le titre ou l'auteur livre à supprimer .");
-                alert.showAndWait();
-      		
-      	    }
-        	
-        	
             if (!livreExiste(con, livre)) {
                 System.out.println("Le livre n'existe pas dans la base de données.");
                 Alert alertInformation = new Alert(Alert.AlertType.INFORMATION);
